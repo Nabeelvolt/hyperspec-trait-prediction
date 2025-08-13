@@ -1,8 +1,24 @@
+import os
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+import constants
 
+DATASET_VERSION = 'v1'
 
+raw_dir = os.path.join(constants.RAW_DIR, DATASET_VERSION)
+file_paths = [
+    os.path.join(raw_dir, f)
+    for f in os.listdir(raw_dir)
+    if os.path.isfile(os.path.join(raw_dir, f))
+]
+
+# Print to confirm
+print("Raw input file paths:")
+for path in file_paths:
+    print(path)
+
+    
 lower_end = 0.4 * 1000
 upper_end = 2.4 * 1000
 params = {
@@ -25,4 +41,5 @@ plt.xticks(np.arange(lower_end, upper_end+1, 300).tolist() + [upper_end])
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('Probability density')
 plt.tight_layout()
-plt.show()
+#plt.show()
+plt.savefig("/app/practice/trim_distributions.png")

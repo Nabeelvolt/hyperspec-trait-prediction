@@ -20,7 +20,7 @@ def write_out_results(result_file, results):
     total = 0.0
     for key, value in results.items():
         if isinstance(value, float) == False:
-            value = np.asscalar(value)
+            value = value.item()
         result_file.write("trait: " + str(key) + ", R square: " + str(value) + "\n")
         total += value
     result_file.write("Average R square: " + str(total / len(results)) + "\n")

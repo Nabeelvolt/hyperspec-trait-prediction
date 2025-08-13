@@ -56,9 +56,9 @@ class HyperSpectrumMultiDataSet(Dataset):
         value_std = statistics['values']['std']
       else:
         value_average = train_input_df.values.mean().astype(np.float32)
-        value_average = np.asscalar(value_average)
+        value_average = value_average.item()
         value_std = train_input_df.values.std().astype(np.float32)
-        value_std = np.asscalar(value_std)
+        value_std = value_std.item()
 
       self.data_values = data.loc[split_indices, 'Wave_400':'Wave_2400'] - value_average
       self.data_values = self.data_values / value_std
@@ -81,9 +81,9 @@ class HyperSpectrumMultiDataSet(Dataset):
         #   trait_std = statistics['traits']['std'][trait]
         # else:
         trait_average = train_df.mean().values.astype(np.float32)
-        trait_average = np.asscalar(trait_average)
+        trait_average = trait_average.item()
         trait_std = train_df.std().values.astype(np.float32)
-        trait_std = np.asscalar(trait_std)
+        trait_std = trait_std.item()
 
         data.loc[split_indices, [trait]] = data.loc[split_indices, [trait]] - trait_average
         data.loc[split_indices, [trait]] = data.loc[split_indices, [trait]] / trait_std

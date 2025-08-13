@@ -150,7 +150,10 @@ def predict(model, traits, dataset, dsloader):
             outputs_df = pd.DataFrame(outputs.detach().cpu().numpy())
             outputs_df.rename(columns={0: 'predicted'}, inplace=True)
 
-            predicted_labels[trait] = predicted_labels[trait].append(pd.concat([labels_df, outputs_df], axis=1), ignore_index=True)
+            predicted_labels[trait] = pd.concat(
+                [predicted_labels[trait], pd.concat([labels_df, outputs_df], axis=1)],
+                ignore_index=True
+            )
 
     return predicted_labels
 
@@ -250,8 +253,11 @@ def compute_results(model, traits, dataset, dsloader, with_additional=False):
 def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir,
                                 batch_size=16, num_epochs=1000,
                                 include_wavelengths=False, writer=None, variable_length_params=None):
+
+    print(f'Train Multitask Larning V2')
     test_every = 10
 
+    print(f'Load DS start')
     train_ds, trainloader = load_ds(c,
                                     traits,
                                     "train",
@@ -273,6 +279,7 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
     if isinstance(traits, str):
       traits = [traits]
 
+    print(f'Compute Label SqDiffs')
     train_label_sq_diffs = compute_label_sq_diffs(traits, train_ds)
 
     best_overall_model = copy.deepcopy(model)
@@ -285,7 +292,9 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
     best_val_REP = {}
     best_model_epoch = 0
 
+    print('Loading traits:')
     for trait in traits:
+        print(f'    | {trait}')
         best_models[trait] = copy.deepcopy(model)
         best_val_R_squares[trait] = -99999.99
         best_val_bias[trait] = -99999.99
@@ -356,11 +365,12 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
             for trait in traits:
               if trait in train_R_squares.keys():
                   if np.isfinite(train_R_squares[trait]):
-                    print("--Trait: {:s}\n\tTrain R square. {:.4f}.\tVal R square: {:.4f}".format(trait, np.asscalar(
-                                                        train_R_squares[trait]), np.asscalar(val_R_squares[trait])))
-            print(" Avg train R square: {:.4f}.\tAvg Val R square: {:.4f}".format(np.asscalar(avg_train_R_square),
-                                                                                 np.asscalar(avg_val_R_square)))
-            val_r_squares.append(np.asscalar(avg_val_R_square))
+                    print("--Trait: {:s}\n\tTrain R square. {:.4f}.\tVal R square: {:.4f}".format(trait,
+                                                                                                  train_R_squares[trait].item(),
+                                                                                                  val_R_squares[trait].item()))
+            print(" Avg train R square: {:.4f}.\tAvg Val R square: {:.4f}".format(avg_train_R_square.item(),
+                                                                                  avg_val_R_square.item()))
+            val_r_squares.append(avg_val_R_square.item())
 
             plot(
               (np.arange(len(val_r_squares)) * test_every).tolist(),
@@ -397,6 +407,6 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
                 best_avg_val_R_square = avg_val_R_square
                 best_model_epoch = epoch
 
-    print("Best avg validation_rsquare: {:4f} ".format(np.asscalar(best_avg_val_R_square)))
+    print("Best avg validation_rsquare: {:4f} ".format(best_avg_val_R_square.item()))
     print("  Found at epoch", best_model_epoch)
     return best_overall_model, best_models, train_results, best_val_R_squares, best_val_bias, best_val_REP

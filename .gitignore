@@ -1,0 +1,8 @@
+*.pth.tar
+*~
+.ipynb_checkpoints/
+mounted/
+results/
+results_1/
+practice/
+*.csv

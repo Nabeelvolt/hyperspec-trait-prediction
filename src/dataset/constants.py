@@ -11,18 +11,18 @@ WEIGHTS_DIR = os.path.join(DATA_DIR, 'model_weights')
 STAT_DUMP_PATH = os.path.join(DATA_DIR, 'statistics.json')
 
 TRAITS = [
-  "LMA_O",
-  "Narea_O",
+  #"LMA_O",
+  #"Narea_O",
   "SPAD_O",
   "Nmass_O",
   # "Parea_O",
   # "Pmass_O",
   "Vcmax",
-  "Vcmax25",
+  #"Vcmax25",
   "J",
-  "Photo_O",
-  "Cond_O",
-  "Vcmax25_Narea_O"
+  #"Photo_O",
+  #"Cond_O",
+  #"Vcmax25_Narea_O"
 ]
 # In case we only want to provide predictions for a subset of the traits later on
 SERVER_PREDICT_TRAITS = TRAITS

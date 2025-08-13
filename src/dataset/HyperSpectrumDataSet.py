@@ -3,7 +3,8 @@ import json
 import numpy as np
 from torch.utils.data import Dataset
 
-import dataset.utils as utils
+#import dataset.utils as utils
+import utils
 import dataset.constants as constants
 
 
@@ -38,9 +39,9 @@ class HyperSpectrumDataSet(Dataset):
           value_std = statistics['values']['std']
         else:
           value_average = train_input_df.values.mean().astype(np.float32)
-          value_average = np.asscalar(value_average)
+          value_average = value_average.item()
           value_std = train_input_df.values.std().astype(np.float32)
-          value_std = np.asscalar(value_std)
+          value_std = value_std.item()
 
 
         # This is the default range
@@ -62,9 +63,9 @@ class HyperSpectrumDataSet(Dataset):
         #normalize target trait
         train_trait_df = data.loc[all_split_indices['train'], [trait]]
         self.trait_average = train_trait_df.mean().values.astype(np.float32)
-        self.trait_average = np.asscalar(self.trait_average)
+        self.trait_average = self.trait_average.item()
         self.trait_std = train_trait_df.std().values.astype(np.float32)
-        self.trait_std = np.asscalar(self.trait_std)
+        self.trait_std = self.trait_std.item()
 
         self.data_labels = data.loc[split_indices,[trait]] - self.trait_average
         self.data_labels = self.data_labels / self.trait_std
