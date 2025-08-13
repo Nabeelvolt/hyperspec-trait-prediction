@@ -97,6 +97,7 @@ def arg_parse():
     parser.add_argument("--test_dataset", dest="test_dataset", default="test", help="Which dataset partition to test models on - should probably be either 'test' or 'all'", type=str)
     parser.add_argument("--model_summary", dest="model_summary", help="Prints model summary when used with config.py.__main__", default=False, action='store_true')
     parser.add_argument("--rng_seed", dest="rng_seed", help="Set a specific seed value", default=1000, type=int)
+    parser.add_argument("--checkpoint_filepath", dest="checkpoint_filepath", help="Set the filepath for loading existing weights", default=None, type=str)
 
     args = parser.parse_args()
     use_cuda = torch.cuda.is_available()

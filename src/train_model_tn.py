@@ -96,9 +96,17 @@ def main():
         output_dim = len(c.traits)
         print(f"working with sizes: in_dim:{input_dim}, in_ch={input_channels}, out_dim={output_dim}")
 
+        # build model
         model = load_model(c, input_dim, input_channels, output_dim)
         print(f"model loaded")
 
+        # apply checkpoint
+        #c.checkpoint_filepath = '/app/mounted/multitask_SPAD_20250813-171141/model.pth.tar'
+        if c.checkpoint_filepath:
+            missing, unexpected = model.load_checkpoint(c.checkpoint_filepath, strict=False)
+            print("missing:", missing[:5], "unexpected:", unexpected[:5])
+
+        # move model to gpu
         print(f"moving model to dev {c.device}")
         model.to(c.device)
         print(f"model to dev")

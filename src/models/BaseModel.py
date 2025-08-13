@@ -26,3 +26,21 @@ class BaseModel(nn.Module):
     def additional_outputs(self):
         """For additional logging during evaluation, return a dict of numpy arrays"""
         return None
+
+    @staticmethod
+    def _extract_state_dict(ckpt):
+        if isinstance(ckpt, dict):
+            for k in ("state_dict", "model_state_dict", "model", "net"):
+                if isinstance(ckpt.get(k), dict):
+                    return ckpt[k]
+            return ckpt
+        return ckpt
+
+    def load_checkpoint(self, chkp_path, strict=False, map_location="cpu"):
+        ckpt = torch.load(chkp_path, map_location=map_location)
+        sd = self._extract_state_dict(ckpt)
+        if any(k.startswith("module.") for k in sd):
+            sd = {k.replace("module.", "", 1): v for k, v in sd.items()}
+        missing, unexpected = self.load_state_dict(sd, strict=strict)
+        self.to(self.device).eval()
+        return missing, unexpected

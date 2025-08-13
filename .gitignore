@@ -1,4 +1,5 @@
 *.pth.tar
+*.swp
 *~
 .ipynb_checkpoints/
 mounted/
