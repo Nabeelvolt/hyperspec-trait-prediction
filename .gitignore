@@ -7,3 +7,4 @@ results/
 results_1/
 practice/
 *.csv
+*__pycache__/

@@ -18,7 +18,7 @@ TRAITS = [
   # "Parea_O",
   # "Pmass_O",
   "Vcmax",
-  #"Vcmax25",
+  "Vcmax25",
   "J",
   #"Photo_O",
   #"Cond_O",

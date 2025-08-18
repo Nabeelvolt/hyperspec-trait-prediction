@@ -183,7 +183,10 @@ def main():
         print("Avg test R square: {:.4f} ".format(total / len(test_results)))
 
         print("Saving to", result_dir)
-        torch.save(best_overall_model.state_dict(), os.path.join(result_dir, 'model.pth.tar'))
+        torch.save(best_overall_model.state_dict(), os.path.join(result_dir, 'model.pth'))
+#        torch.save(best_overall_model.state_dict(), os.path.join(result_dir, 'model.pth.tar'))
+
+
     else:
         raise ValueError("Must set c.multi_task = True if running train_model_tn.py")
 
