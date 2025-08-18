@@ -1,0 +1,10 @@
+*.pth.tar
+*.swp
+*~
+.ipynb_checkpoints/
+mounted/
+results/
+results_1/
+practice/
+*.csv
+*__pycache__/

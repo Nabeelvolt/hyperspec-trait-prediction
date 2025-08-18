@@ -1,36 +1,95 @@
 version: '2.3'
+
 services:
+  # Your primary worker / training container
   main:
     build: .
     image: hyper-spectrum-image
+    working_dir: /app
     volumes:
       - .:/app
       - ./data:/data
+    tmpfs:
+      - /tmp
     runtime: nvidia
+    ipc: host
+    privileged: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_CACHE_PATH=/tmp/cuda-cache
+      - CUDA_CACHE_MAXSIZE=2147483647
+      - CUDA_MODULE_LOADING=LAZY
+      - PYTHONIOENCODING=UTF-8
+    command: >
+      bash -lc "mkdir -p /tmp/cuda-cache && chmod 777 /tmp/cuda-cache && tail -f /dev/null"
+
+  # Your app/server process
   server:
     image: hyper-spectrum-image
+    working_dir: /app
     ports:
-      - 5000:5000
+      - "5000:5000"
     volumes:
       - .:/app
       - ./data:/data
+    tmpfs:
+      - /tmp
+    runtime: nvidia
+    ipc: host
+    privileged: true
     environment:
       - MODE=dev
-    command: ["python3", "src/server.py"]
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_CACHE_PATH=/tmp/cuda-cache
+      - CUDA_CACHE_MAXSIZE=2147483647
+      - CUDA_MODULE_LOADING=LAZY
+      - PYTHONIOENCODING=UTF-8
+    command: >
+      bash -lc "mkdir -p /tmp/cuda-cache && chmod 777 /tmp/cuda-cache && exec python3 src/server.py"
+
+  # TensorBoard (runs from same image so it has your Python deps)
   tensorboard:
-    image: tensorflow/tensorflow
-    volumes:
-      - ./results:/mounted
+    image: hyper-spectrum-image
+    working_dir: /app
     ports:
-      - 6009:6006
-    command: ["tensorboard", "--logdir=/mounted", "--bind_all"]
+      - "6009:6006"
+    volumes:
+      - .:/app
+      - ./results:/mounted
+    tmpfs:
+      - /tmp
+    runtime: nvidia
+    ipc: host
+    privileged: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_CACHE_PATH=/tmp/cuda-cache
+      - CUDA_CACHE_MAXSIZE=2147483647
+      - CUDA_MODULE_LOADING=LAZY
+      - PYTHONIOENCODING=UTF-8
+    command: >
+      bash -lc "mkdir -p /tmp/cuda-cache && chmod 777 /tmp/cuda-cache && exec tensorboard --logdir=/mounted --bind_all"
+
+  # Jupyter notebook for experimentation
   jupyter:
-    build:
-      context: .
-      dockerfile: Dockerfile.jupyter
+    image: hyper-spectrum-image
+    working_dir: /code
+    ports:
+      - "8888:8888"
     volumes:
       - .:/code
       - ./data:/data
-    ports:
-      - 8888:8888
-    command: ["jupyter", "notebook", "--ip='*'", "--NotebookApp.token=''", "--NotebookApp.password=''", "--notebook-dir=/code"]
+    tmpfs:
+      - /tmp
+    runtime: nvidia
+    ipc: host
+    privileged: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_CACHE_PATH=/tmp/cuda-cache
+      - CUDA_CACHE_MAXSIZE=2147483647
+      - CUDA_MODULE_LOADING=LAZY
+      - PYTHONIOENCODING=UTF-8
+    command: >
+      bash -lc "mkdir -p /tmp/cuda-cache && chmod 777 /tmp/cuda-cache &&
+      jupyter notebook --ip=0.0.0.0 --NotebookApp.token='' --NotebookApp.password='' --notebook-dir=/code"
